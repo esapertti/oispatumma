@@ -31,7 +31,8 @@
             font-size: 24px;
             color: #fff;
             border-radius: 5px;
-            background-color: #ccc; /* Tyhjät ruudut harmaita */
+            height: 100%; /* Varmistaa, että korkeus on 100% */
+            width: 100%; /* Varmistaa, että leveys on 100% */
         }
         .tile-2 { background-color: #eee4da; }
         .tile-4 { background-color: #ede0c8; }
@@ -44,9 +45,8 @@
         .tile-512 { background-color: #f9c74f; }
         .tile-1024 { background-color: #f9c74f; }
         .tile-2048 { background-color: #f9c74f; }
-        /* Tyylit ohjeikkunalle */
         #instructions {
-            display: none; /* Aluksi piilotettu */
+            display: none;
             position: fixed;
             top: 50%;
             left: 50%;
@@ -55,27 +55,22 @@
             padding: 20px;
             border: 2px solid #333;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            z-index: 10;
+            z-index: 1000;
         }
         #overlay {
-            display: none; /* Aluksi piilotettu */
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 5;
+            z-index: 999;
         }
-        .close {
+        #close-instructions {
             cursor: pointer;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
-            margin-top: 10px;
+            color: blue;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -83,31 +78,27 @@
     <h1>Oispatumma</h1>
     <div id="game"></div>
     <button id="villat">Villat</button>
-    <button id="instructionsButton">Ohjeet</button>
-
-    <!-- Ohjeetikkuna -->
+    <button id="instructions-button">Ohjeet</button>
     <div id="overlay"></div>
     <div id="instructions">
-        <h2>Ohjeet</h2>
-        <p>Oispatumma on peli, joka perustuu 2048-peliin. Tavoitteena on yhdistää palikoita, kunnes saavutat 2048. Peli ei kuitenkaan lopu siihen.</p>
-        <p>Ohjeet:</p>
+        <h2>Peliohjeet</h2>
+        <p>Tavoitteena on yhdistää palikoita, kunnes saavutat 2048. Peli ei kuitenkaan lopu siihen.</p>
+        <p>Ohjaus:</p>
         <ul>
-            <li>Käytä nuolinäppäimiä liikkuaksesi vasemmalle, oikealle, ylös tai alas.</li>
-            <li>Yhdistä samanarvoiset palikat saadaksesi suurempia arvoja.</li>
-            <li>Paina "Villat" -nappia poistaaksesi huonoimmat palikat ja säilyttääksesi parhaat 6.</li>
+            <li>Nuolinäppäimet liikuttavat palikoita</li>
+            <li>Paina "Villat" poistaaksesi huonoimmat palikat</li>
         </ul>
         <p>Pelin on tehnyt ksppk.</p>
-        <button class="close" id="closeInstructions">Sulje</button>
+        <div id="close-instructions">Sulje</div>
     </div>
-
     <script>
         const grid = Array(4).fill(null).map(() => Array(4).fill(0));
         const gameContainer = document.getElementById('game');
         const villatButton = document.getElementById('villat');
-        const instructionsButton = document.getElementById('instructionsButton');
-        const instructionsDiv = document.getElementById('instructions');
+        const instructionsButton = document.getElementById('instructions-button');
         const overlay = document.getElementById('overlay');
-        const closeInstructionsButton = document.getElementById('closeInstructions');
+        const instructionsDiv = document.getElementById('instructions');
+        const closeInstructionsButton = document.getElementById('close-instructions');
 
         function init() {
             addNewNumber();
@@ -209,7 +200,6 @@
         }
 
         function villat() {
-            // Poista huonoimmat palikat
             const counts = {};
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
@@ -241,22 +231,10 @@
                     grid[i][j] = newGrid[i][j];
                 }
             }
+
             render();
         }
 
-        villatButton.addEventListener('click', villat);
-
-        instructionsButton.addEventListener('click', () => {
-            overlay.style.display = 'block';
-            instructionsDiv.style.display = 'block';
-        });
-
-        closeInstructionsButton.addEventListener('click', () => {
-            overlay.style.display = 'none';
-            instructionsDiv.style.display = 'none';
-        });
-
-        // Kuuntelee nuolinäppäimiä
         window.addEventListener('keydown', (event) => {
             switch (event.key) {
                 case 'ArrowLeft':
@@ -274,7 +252,19 @@
             }
         });
 
+        villatButton.addEventListener('click', villat);
+        instructionsButton.addEventListener('click', () => {
+            overlay.style.display = 'block';
+            instructionsDiv.style.display = 'block';
+        });
+        closeInstructionsButton.addEventListener('click', () => {
+            overlay.style.display = 'none';
+            instructionsDiv.style.display = 'none';
+        });
+
+        // Aloita peli
         init();
     </script>
 </body>
 </html>
+
