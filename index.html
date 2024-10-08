@@ -31,6 +31,7 @@
             font-size: 24px;
             color: #fff;
             border-radius: 5px;
+            background-color: #ccc; /* Tyhjät ruudut harmaita */
         }
         .tile-2 { background-color: #eee4da; }
         .tile-4 { background-color: #ede0c8; }
@@ -43,16 +44,70 @@
         .tile-512 { background-color: #f9c74f; }
         .tile-1024 { background-color: #f9c74f; }
         .tile-2048 { background-color: #f9c74f; }
+        /* Tyylit ohjeikkunalle */
+        #instructions {
+            display: none; /* Aluksi piilotettu */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        #overlay {
+            display: none; /* Aluksi piilotettu */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 5;
+        }
+        .close {
+            cursor: pointer;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Oispatumma</h1>
     <div id="game"></div>
     <button id="villat">Villat</button>
+    <button id="instructionsButton">Ohjeet</button>
+
+    <!-- Ohjeetikkuna -->
+    <div id="overlay"></div>
+    <div id="instructions">
+        <h2>Ohjeet</h2>
+        <p>Oispatumma on peli, joka perustuu 2048-peliin. Tavoitteena on yhdistää palikoita, kunnes saavutat 2048. Peli ei kuitenkaan lopu siihen.</p>
+        <p>Ohjeet:</p>
+        <ul>
+            <li>Käytä nuolinäppäimiä liikkuaksesi vasemmalle, oikealle, ylös tai alas.</li>
+            <li>Yhdistä samanarvoiset palikat saadaksesi suurempia arvoja.</li>
+            <li>Paina "Villat" -nappia poistaaksesi huonoimmat palikat ja säilyttääksesi parhaat 6.</li>
+        </ul>
+        <p>Pelin on tehnyt ksppk.</p>
+        <button class="close" id="closeInstructions">Sulje</button>
+    </div>
+
     <script>
         const grid = Array(4).fill(null).map(() => Array(4).fill(0));
         const gameContainer = document.getElementById('game');
         const villatButton = document.getElementById('villat');
+        const instructionsButton = document.getElementById('instructionsButton');
+        const instructionsDiv = document.getElementById('instructions');
+        const overlay = document.getElementById('overlay');
+        const closeInstructionsButton = document.getElementById('closeInstructions');
 
         function init() {
             addNewNumber();
@@ -171,4 +226,55 @@
             bestTiles.forEach(tile => {
                 for (let i = 0; i < 4; i++) {
                     for (let j = 0; j < 4; j++) {
-       
+                        if (grid[i][j] === parseInt(tile)) {
+                            newGrid[Math.floor(pos / 4)][pos % 4] = grid[i][j];
+                            pos++;
+                            if (pos >= 24) return; // Max 24 palikkaa
+                        }
+                    }
+                }
+            });
+
+            // Täytetään uusi ruudukko
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    grid[i][j] = newGrid[i][j];
+                }
+            }
+            render();
+        }
+
+        villatButton.addEventListener('click', villat);
+
+        instructionsButton.addEventListener('click', () => {
+            overlay.style.display = 'block';
+            instructionsDiv.style.display = 'block';
+        });
+
+        closeInstructionsButton.addEventListener('click', () => {
+            overlay.style.display = 'none';
+            instructionsDiv.style.display = 'none';
+        });
+
+        // Kuuntelee nuolinäppäimiä
+        window.addEventListener('keydown', (event) => {
+            switch (event.key) {
+                case 'ArrowLeft':
+                    moveLeft();
+                    break;
+                case 'ArrowRight':
+                    moveRight();
+                    break;
+                case 'ArrowUp':
+                    moveUp();
+                    break;
+                case 'ArrowDown':
+                    moveDown();
+                    break;
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>
