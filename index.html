@@ -45,14 +45,27 @@
         .tile-512 { background-color: #f9c74f; }
         .tile-1024 { background-color: #f9c74f; }
         .tile-2048 { background-color: #f9c74f; }
+        #instructions {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
     <h1>Oispatumma</h1>
     <div id="game"></div>
+    <div id="instructions">
+        <p>Peli perustuu 2048-peliin. Tavoitteena on yhdistää samat numerot, kunnes saavutetaan 2048.</p>
+        <p>Liiku nuolinäppäimillä: ylös, alas, vasemmalle, oikealle.</p>
+        <p>Valitse "Villat"-nappi poistaaksesi huonoimmat palikat ja jättää parhaat 6 viereen.</p>
+        <p>Pelin on tehnyt ksppk.</p>
+    </div>
+    <button id="villat">Villat</button>
     <script>
         const grid = Array(4).fill(null).map(() => Array(4).fill(0));
         const gameContainer = document.getElementById('game');
+        const villatButton = document.getElementById('villat');
 
         function init() {
             addNewNumber();
@@ -84,8 +97,6 @@
                     if (grid[i][j] !== 0) {
                         tile.classList.add(`tile-${grid[i][j]}`);
                         tile.innerText = grid[i][j];
-                    } else {
-                        tile.innerText = ''; // Tyhjennä ruutu, jos se on 0
                     }
                     gameContainer.appendChild(tile);
                 }
@@ -155,6 +166,51 @@
             render();
         }
 
+        function villat() {
+            // Poista huonoimmat palikat
+            const counts = {};
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (grid[i][j] !== 0) {
+                        counts[grid[i][j]] = (counts[grid[i][j]] || 0) + 1;
+                    }
+                }
+            }
+
+            const bestTiles = Object.keys(counts).sort((a, b) => b - a).slice(0, 6);
+            const newGrid = Array(4).fill(null).map(() => Array(4).fill(0));
+            let pos = 0;
+
+            bestTiles.forEach(tile => {
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        if (grid[i][j] === parseInt(tile) && pos < 6) {
+                            newGrid[Math.floor(pos / 4)][pos % 4] = grid[i][j];
+                            pos++;
+                        }
+                    }
+                }
+            });
+
+            // Täytetään loput ruudut nollilla
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (pos < 24) {
+                        newGrid[i][j] = 0;
+                        pos++;
+                    }
+                }
+            }
+
+            // Päivitetään ruudukko
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    grid[i][j] = newGrid[i][j];
+                }
+            }
+            render();
+        }
+
         document.addEventListener('keydown', (event) => {
             switch (event.key) {
                 case 'ArrowLeft':
@@ -172,8 +228,9 @@
             }
         });
 
+        villatButton.addEventListener('click', villat);
+
         init();
     </script>
 </body>
 </html>
-
