@@ -104,10 +104,7 @@
         }
 
         function compress(row) {
-            const newRow = row.filter(value => value);
-            const missing = 4 - newRow.length;
-            const zeros = Array(missing).fill(0);
-            return newRow.concat(zeros);
+            return row.filter(value => value).concat(Array(4).fill(0).slice(0, 4 - row.filter(value => value).length));
         }
 
         function merge(row) {
@@ -229,7 +226,6 @@
         });
 
         villatButton.addEventListener('click', villat);
-
         init();
     </script>
 </body>
