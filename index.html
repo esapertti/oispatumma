@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oispatumma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #faf8ef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        #game {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 5px;
+            background-color: #bbada0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .tile {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #fff;
+            border-radius: 5px;
+        }
+        .tile-2 { background-color: #eee4da; }
+        .tile-4 { background-color: #ede0c8; }
+        .tile-8 { background-color: #f2b179; }
+        .tile-16 { background-color: #f59563; }
+        .tile-32 { background-color: #f67c5f; }
+        .tile-64 { background-color: #f67c5f; }
+        .tile-128 { background-color: #f9c74f; }
+        .tile-256 { background-color: #f9c74f; }
+        .tile-512 { background-color: #f9c74f; }
+        .tile-1024 { background-color: #f9c74f; }
+        .tile-2048 { background-color: #f9c74f; }
+    </style>
+</head>
+<body>
+    <h1>Oispatumma</h1>
+    <div id="game"></div>
+    <button id="villat">Villat</button>
+    <script>
+        const grid = Array(4).fill(null).map(() => Array(4).fill(0));
+        const gameContainer = document.getElementById('game');
+        const villatButton = document.getElementById('villat');
+
+        function init() {
+            addNewNumber();
+            addNewNumber();
+            render();
+        }
+
+        function addNewNumber() {
+            const emptyCells = [];
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (grid[i][j] === 0) {
+                        emptyCells.push({ x: i, y: j });
+                    }
+                }
+            }
+            if (emptyCells.length > 0) {
+                const { x, y } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                grid[x][y] = Math.random() < 0.9 ? 2 : 4;
+            }
+        }
+
+        function render() {
+            gameContainer.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    const tile = document.createElement('div');
+                    tile.classList.add('tile');
+                    if (grid[i][j] !== 0) {
+                        tile.classList.add(`tile-${grid[i][j]}`);
+                        tile.innerText = grid[i][j];
+                    }
+                    gameContainer.appendChild(tile);
+                }
+            }
+        }
+
+        function compress(row) {
+            const newRow = row.filter(value => value);
+            const missing = 4 - newRow.length;
+            const zeros = Array(missing).fill(0);
+            return newRow.concat(zeros);
+        }
+
+        function merge(row) {
+            for (let i = 0; i < 3; i++) {
+                if (row[i] === row[i + 1] && row[i] !== 0) {
+                    row[i] *= 2;
+                    row[i + 1] = 0;
+                }
+            }
+            return compress(row);
+        }
+
+        function moveLeft() {
+            for (let i = 0; i < 4; i++) {
+                grid[i] = compress(grid[i]);
+                grid[i] = merge(grid[i]);
+                grid[i] = compress(grid[i]);
+            }
+            addNewNumber();
+            render();
+        }
+
+        function moveRight() {
+            for (let i = 0; i < 4; i++) {
+                grid[i] = compress(grid[i].reverse()).reverse();
+                grid[i] = merge(grid[i].reverse()).reverse();
+                grid[i] = compress(grid[i].reverse()).reverse();
+            }
+            addNewNumber();
+            render();
+        }
+
+        function moveUp() {
+            for (let i = 0; i < 4; i++) {
+                const col = [grid[0][i], grid[1][i], grid[2][i], grid[3][i]];
+                const newCol = compress(col);
+                const mergedCol = merge(newCol);
+                for (let j = 0; j < 4; j++) {
+                    grid[j][i] = mergedCol[j];
+                }
+            }
+            addNewNumber();
+            render();
+        }
+
+        function moveDown() {
+            for (let i = 0; i < 4; i++) {
+                const col = [grid[0][i], grid[1][i], grid[2][i], grid[3][i]];
+                const newCol = compress(col.reverse()).reverse();
+                const mergedCol = merge(newCol);
+                for (let j = 0; j < 4; j++) {
+                    grid[j][i] = mergedCol.reverse()[j];
+                }
+            }
+            addNewNumber();
+            render();
+        }
+
+        function villat() {
+            // Poista huonoimmat palikat
+            const counts = {};
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (grid[i][j] !== 0) {
+                        counts[grid[i][j]] = (counts[grid[i][j]] || 0) + 1;
+                    }
+                }
+            }
+
+            const bestTiles = Object.keys(counts).sort((a, b) => b - a).slice(0, 6);
+            const newGrid = Array(4).fill(null).map(() => Array(4).fill(0));
+            let pos = 0;
+
+            bestTiles.forEach(tile => {
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+       
