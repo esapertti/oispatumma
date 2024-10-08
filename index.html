@@ -84,6 +84,8 @@
                     if (grid[i][j] !== 0) {
                         tile.classList.add(`tile-${grid[i][j]}`);
                         tile.innerText = grid[i][j];
+                    } else {
+                        tile.innerText = ''; // Tyhjennä ruutu, jos se on 0
                     }
                     gameContainer.appendChild(tile);
                 }
@@ -174,3 +176,4 @@
     </script>
 </body>
 </html>
+
