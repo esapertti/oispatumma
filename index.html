@@ -45,60 +45,16 @@
         .tile-512 { background-color: #f9c74f; }
         .tile-1024 { background-color: #f9c74f; }
         .tile-2048 { background-color: #f9c74f; }
-        #instructions {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border: 2px solid #333;
-            border-radius: 10px;
-            z-index: 1000;
-        }
-        #overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-        #close-instructions {
-            cursor: pointer;
-            color: blue;
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
     <h1>Oispatumma</h1>
     <div id="game"></div>
     <button id="villat">Villat</button>
-    <button id="instructions-button">Ohjeet</button>
-    <div id="overlay"></div>
-    <div id="instructions">
-        <h2>Peliohjeet</h2>
-        <p>Tavoitteena on yhdistää palikoita, kunnes saavutat 2048. Peli ei kuitenkaan lopu siihen.</p>
-        <p>Ohjaus:</p>
-        <ul>
-            <li>Nuolinäppäimet liikuttavat palikoita</li>
-            <li>Paina "Villat" poistaaksesi huonoimmat palikat</li>
-        </ul>
-        <p>Pelissä on tehnyt ksppk.</p>
-        <p id="close-instructions">Sulje</p>
-    </div>
     <script>
         const grid = Array(4).fill(null).map(() => Array(4).fill(0));
         const gameContainer = document.getElementById('game');
         const villatButton = document.getElementById('villat');
-        const instructionsButton = document.getElementById('instructions-button');
-        const instructionsDiv = document.getElementById('instructions');
-        const overlay = document.getElementById('overlay');
-        const closeInstructionsButton = document.getElementById('close-instructions');
 
         function init() {
             addNewNumber();
@@ -199,40 +155,6 @@
             render();
         }
 
-        function villat() {
-            const counts = {};
-            for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 4; j++) {
-                    if (grid[i][j] !== 0) {
-                        counts[grid[i][j]] = (counts[grid[i][j]] || 0) + 1;
-                    }
-                }
-            }
-
-            const bestTiles = Object.keys(counts).sort((a, b) => b - a).slice(0, 6);
-            const newGrid = Array(4).fill(null).map(() => Array(4).fill(0));
-            let pos = 0;
-
-            bestTiles.forEach(tile => {
-                for (let i = 0; i < 4; i++) {
-                    for (let j = 0; j < 4; j++) {
-                        if (grid[i][j] == tile && pos < 6) {
-                            newGrid[Math.floor(pos / 4)][pos % 4] = tile;
-                            pos++;
-                        }
-                    }
-                }
-            });
-
-            for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 4; j++) {
-                    grid[i][j] = newGrid[i][j];
-                }
-            }
-            addNewNumber();
-            render();
-        }
-
         document.addEventListener('keydown', (event) => {
             switch (event.key) {
                 case 'ArrowLeft':
@@ -250,14 +172,9 @@
             }
         });
 
-        villatButton.addEventListener('click', villat);
-        instructionsButton.addEventListener('click', () => {
-            instructionsDiv.style.display = 'block';
-            overlay.style.display = 'block';
-        });
-        closeInstructionsButton.addEventListener('click', () => {
-            instructionsDiv.style.display = 'none';
-            overlay.style.display = 'none';
+        villatButton.addEventListener('click', () => {
+            // Tässä voidaan lisätä villat-toiminto, mutta se on tällä hetkellä tyhjää
+            alert("Villat-toiminto ei ole käytössä vielä.");
         });
 
         init();
