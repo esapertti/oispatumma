@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #ffffff; /* Tausta on valkoinen */
+            background-color: #ffffff; /* Valkoinen tausta */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -20,7 +20,7 @@
             grid-template-columns: repeat(4, 100px);
             grid-template-rows: repeat(4, 100px);
             gap: 5px;
-            background-color: #bbada0; /* Ruudukko on harmaa */
+            background-color: #bbada0; /* Harmaa ruudukko */
             padding: 10px;
             border-radius: 10px;
         }
@@ -50,11 +50,9 @@
 <body>
     <h1>Oispatumma</h1>
     <div id="game"></div>
-    <button id="villat">Villat</button>
     <script>
         const grid = Array(4).fill(null).map(() => Array(4).fill(0));
         const gameContainer = document.getElementById('game');
-        const villatButton = document.getElementById('villat');
 
         function init() {
             addNewNumber();
@@ -170,11 +168,6 @@
                     moveDown();
                     break;
             }
-        });
-
-        villatButton.addEventListener('click', () => {
-            // Tässä voidaan lisätä villat-toiminto, mutta se on tällä hetkellä tyhjää
-            alert("Villat-toiminto ei ole käytössä vielä.");
         });
 
         init();
